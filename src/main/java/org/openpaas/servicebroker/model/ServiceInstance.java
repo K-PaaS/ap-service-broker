@@ -1,6 +1,5 @@
 package org.openpaas.servicebroker.model;
 
-import org.springframework.http.HttpStatus;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,12 +39,15 @@ public class ServiceInstance {
 	@JsonSerialize
 	@JsonProperty("dashboard_url")
 	private String dashboardUrl;
-	
-	@JsonIgnore
-	private HttpStatus httpStatus = HttpStatus.CREATED;
 
-	@SuppressWarnings("unused")
-	private ServiceInstance() {}
+	@JsonSerialize
+	@JsonProperty("last_operation")
+	private ServiceInstanceLastOperation lastOperation;
+
+	@JsonIgnore
+	private boolean async;
+
+	public ServiceInstance() {}
 	
 	/**
 	 * Create a ServiceInstance from a create request. If fields 
@@ -59,6 +61,7 @@ public class ServiceInstance {
 		this.organizationGuid = request.getOrganizationGuid();
 		this.spaceGuid = request.getSpaceGuid();
 		this.serviceInstanceId = request.getServiceInstanceId();
+		this.lastOperation = new ServiceInstanceLastOperation("Provisioning", OperationState.IN_PROGRESS);
 	}
 	
 	/**
@@ -71,6 +74,7 @@ public class ServiceInstance {
 		this.serviceInstanceId = request.getServiceInstanceId();
 		this.planId = request.getPlanId();
 		this.serviceDefinitionId = request.getServiceId();
+		this.lastOperation = new ServiceInstanceLastOperation("Deprovisioning", OperationState.IN_PROGRESS);
 	}
 	
 	/**
@@ -82,6 +86,7 @@ public class ServiceInstance {
 	public ServiceInstance(UpdateServiceInstanceRequest request) { 
 		this.planId = request.getPlanId();
 		this.serviceInstanceId = request.getServiceInstanceId();
+		this.lastOperation = new ServiceInstanceLastOperation("Updating", OperationState.IN_PROGRESS);
 	}
 	
 	public ServiceInstance withDashboardUrl(String dashboardUrl) { 
@@ -120,12 +125,30 @@ public class ServiceInstance {
 	public String getDashboardUrl() {
 		return dashboardUrl;
 	}
-	
-	public void setHttpStatusOK(){
-		this.httpStatus=HttpStatus.OK;
+
+	public boolean isAsync() {
+		return this.async;
 	}
-	
-	public HttpStatus getHttpStatus(){
-		return httpStatus;
+
+	public ServiceInstance and() {
+		return this;
+	}
+
+	public ServiceInstance withLastOperation(ServiceInstanceLastOperation lastOperation) {
+		this.lastOperation = lastOperation;
+		return this;
+	}
+
+	public ServiceInstance withAsync(boolean async) {
+		this.async = async;
+		return this;
+	}
+
+	public ServiceInstanceLastOperation getServiceInstanceLastOperation() {
+		return this.lastOperation;
+	}
+
+	public String toString() {
+		return "ServiceInstance{serviceInstanceId='" + this.serviceInstanceId + '\'' + ", serviceDefinitionId='" + this.serviceDefinitionId + '\'' + ", planId='" + this.planId + '\'' + ", organizationGuid='" + this.organizationGuid + '\'' + ", spaceGuid='" + this.spaceGuid + '\'' + ", dashboardUrl='" + this.dashboardUrl + '\'' + ", lastOperation=" + this.lastOperation + ", async=" + this.async + '}';
 	}
 }

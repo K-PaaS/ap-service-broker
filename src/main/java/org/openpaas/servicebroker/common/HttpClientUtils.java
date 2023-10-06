@@ -23,8 +23,8 @@ public class HttpClientUtils {
 		requestFactory.setReadTimeout(0);
 		
 		client.setRequestFactory(requestFactory);
-		
-		ResponseEntity<String> httpResponse=null;
+
+		ResponseEntity httpResponse=null;
 		try {
 			httpResponse = client.exchange(uri, httpMethod, entity, String.class);		
 		} catch (Exception e) {
@@ -49,8 +49,8 @@ public class HttpClientUtils {
 		requestFactory.setReadTimeout(0);
 		
 		client.setRequestFactory(requestFactory);
-		
-		ResponseEntity<String> httpResponse=null;
+
+		ResponseEntity httpResponse=null;
 		try {
 			httpResponse = client.exchange(uri, httpMethod, entity, String.class);		
 		} catch (Exception e) {
@@ -71,8 +71,8 @@ public class HttpClientUtils {
 		requestFactory.setReadTimeout(0);
 		
 		client.setRequestFactory(requestFactory);
-		
-		ResponseEntity<String> httpResponse=null;
+
+		ResponseEntity httpResponse=null;
 		try {
 			httpResponse = client.exchange(uri, httpMethod, entity, String.class);		
 		} catch (Exception e) {
@@ -93,8 +93,8 @@ public class HttpClientUtils {
 		requestFactory.setReadTimeout(0);
 		
 		client.setRequestFactory(requestFactory);
-		
-		ResponseEntity<String> httpResponse=null;
+
+		ResponseEntity httpResponse=null;
 		try {
 			httpResponse = client.exchange(uri, httpMethod, entity, String.class);		
 		} catch (Exception e) {

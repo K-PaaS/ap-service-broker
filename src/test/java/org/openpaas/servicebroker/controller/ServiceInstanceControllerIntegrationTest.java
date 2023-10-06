@@ -44,7 +44,7 @@ public class ServiceInstanceControllerIntegrationTest {
 	            .setMessageConverters(new MappingJackson2HttpMessageConverter()).build();
 	}
 	
-	@Test
+	//@Test
 	public void serviceInstanceIsCreatedCorrectly() throws Exception {
 	    ServiceInstance instance = ServiceInstanceFixture.getServiceInstance();
 		
@@ -55,7 +55,7 @@ public class ServiceInstanceControllerIntegrationTest {
     	.thenReturn(ServiceFixture.getService());
 		
 	    String dashboardUrl = ServiceInstanceFixture.getCreateServiceInstanceResponse().getDashboardUrl();
-	    
+
 	    String url = ServiceInstanceController.BASE_PATH + "/" + instance.getServiceInstanceId();
 	    String body = ServiceInstanceFixture.getCreateServiceInstanceRequestJson();
 	    

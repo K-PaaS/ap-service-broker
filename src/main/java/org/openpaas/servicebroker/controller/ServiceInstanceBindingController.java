@@ -62,7 +62,7 @@ public class ServiceInstanceBindingController extends BaseController {
 			@Valid @RequestBody CreateServiceInstanceBindingRequest request) throws
 			ServiceInstanceDoesNotExistException, ServiceInstanceBindingExistsException, 
 			ServiceBrokerException {
-		logger.debug( "PUT: " + BASE_PATH + "/{bindingId}"
+		logger.info( "PUT: " + BASE_PATH + "/{bindingId}"
 				+ ", bindServiceInstance(), serviceInstance.id = " + instanceId 
 				+ ", bindingId = " + bindingId);
 		ServiceInstance instance = serviceInstanceService.getServiceInstance(instanceId);
@@ -71,7 +71,7 @@ public class ServiceInstanceBindingController extends BaseController {
 		}
 		ServiceInstanceBinding binding = serviceInstanceBindingService.createServiceInstanceBinding(
 				request.withServiceInstanceId(instanceId).and().withBindingId(bindingId));
-		logger.debug("ServiceInstanceBinding Created: " + binding.getId());
+		logger.info("ServiceInstanceBinding Created: " + binding.getId());
         return new ResponseEntity<ServiceInstanceBindingResponse>(
         		new ServiceInstanceBindingResponse(binding), 
         		binding.getHttpStatus());
