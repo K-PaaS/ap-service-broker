@@ -34,7 +34,9 @@ public interface ServiceInstanceService {
 	 * @return The ServiceInstance with the given id or null if one does not exist
 	 */
 	ServiceInstance getServiceInstance(String serviceInstanceId);
-	
+
+	ServiceInstance getOperationServiceInstance(String operationServiceInstanceId);
+
 	/**
 	 * Delete and return the instance if it exists.
 	 * @param deleteServiceInstanceRequest containing pertinent information for deleting the service.

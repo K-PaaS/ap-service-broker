@@ -2,7 +2,6 @@ package org.openpaas.servicebroker.controller;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import org.openpaas.servicebroker.exception.ServiceBrokerException;
 import org.openpaas.servicebroker.exception.ServiceDefinitionDoesNotExistException;
 import org.openpaas.servicebroker.exception.ServiceInstanceDoesNotExistException;
@@ -12,16 +11,28 @@ import org.openpaas.servicebroker.model.CreateServiceInstanceRequest;
 import org.openpaas.servicebroker.model.CreateServiceInstanceResponse;
 import org.openpaas.servicebroker.model.DeleteServiceInstanceRequest;
 import org.openpaas.servicebroker.model.ErrorMessage;
+import org.openpaas.servicebroker.model.OperationState;
 import org.openpaas.servicebroker.model.ServiceDefinition;
 import org.openpaas.servicebroker.model.ServiceInstance;
+import org.openpaas.servicebroker.model.ServiceInstanceLastOperation;
 import org.openpaas.servicebroker.model.UpdateServiceInstanceRequest;
 import org.openpaas.servicebroker.service.CatalogService;
 import org.openpaas.servicebroker.service.ServiceInstanceService;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 서비스 인스턴스 관련 Provision/Undate Instance/Unprovision API 를 호출 받는 컨트롤러이다.
@@ -68,9 +79,8 @@ public class ServiceInstanceController extends BaseController {
 				request.withServiceDefinition(svc).and().withServiceInstanceId(serviceInstanceId));
 		
 		logger.debug("ServiceInstance Created: " + instance.getServiceInstanceId());
-        return new ResponseEntity<CreateServiceInstanceResponse>(
-        		new CreateServiceInstanceResponse(instance), 
-        		instance.getHttpStatus());
+		logger.info("Service Instance" + instance.toString());
+		return new ResponseEntity(new CreateServiceInstanceResponse(instance), instance.isAsync() ? HttpStatus.ACCEPTED : HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = BASE_PATH + "/{instanceId}", method = RequestMethod.DELETE)
@@ -78,7 +88,7 @@ public class ServiceInstanceController extends BaseController {
 			@PathVariable("instanceId") String instanceId, 
 			@RequestParam("service_id") String serviceId,
 			@RequestParam("plan_id") String planId) throws ServiceBrokerException {
-		logger.debug( "DELETE: " + BASE_PATH + "/{instanceId}" 
+		logger.info( "DELETE: " + BASE_PATH + "/{instanceId}"
 				+ ", deleteServiceInstanceBinding(), serviceInstanceId = " + instanceId 
 				+ ", serviceId = " + serviceId
 				+ ", planId = " + planId);
@@ -106,7 +116,20 @@ public class ServiceInstanceController extends BaseController {
 		logger.debug("ServiceInstance updated: " + instance.getServiceInstanceId());
 		return new ResponseEntity<String>("{}", HttpStatus.OK);
 	}
-
+	@RequestMapping(value = BASE_PATH + "/{instanceId}/last_operation", method = RequestMethod.GET)
+	public ResponseEntity<?> getServiceInstanceLastOperation(@PathVariable("instanceId") String instanceId) {
+		logger.info("GET: /v2/service_instances/{instanceId}/last_operation, getServiceInstance(), serviceInstanceId = " + instanceId);
+		ServiceInstance instance = this.service.getOperationServiceInstance(instanceId);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		if (null == instance) {
+			return new ResponseEntity("{}", headers, HttpStatus.GONE);
+		} else {
+			ServiceInstanceLastOperation lastOperation = new ServiceInstanceLastOperation("test", OperationState.SUCCEEDED);
+			logger.info("ServiceInstance: " + instance.getServiceInstanceId() + " is in succeed state. Details : " + instance.getDashboardUrl());
+			return new ResponseEntity(lastOperation, headers, HttpStatus.OK);
+		}
+	}
 	
 	@ExceptionHandler(ServiceDefinitionDoesNotExistException.class)
 	@ResponseBody
